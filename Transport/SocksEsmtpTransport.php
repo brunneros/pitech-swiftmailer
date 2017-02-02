@@ -42,13 +42,11 @@ class SocksEsmtpTransport extends Swift_Transport_EsmtpTransport
         'stream_context_options' => array(),
     );
 
-    private $socksHost;
-
     /**
      * Creates a new EsmtpTransport using the given I/O buffer.
-     * @param Swift_Transport_IoBuffer $socksHost
+     * @param Swift_Transport_IoBuffer $socksProxy
      */
-    public function __construct($socksHost)
+    public function __construct($socksProxy)
     {
         // get dependencies for parent EsmtpTransport
         $transportDeps = Swift_DependencyContainer::getInstance()
@@ -59,10 +57,9 @@ class SocksEsmtpTransport extends Swift_Transport_EsmtpTransport
                     ->createDependenciesFor('transport.buffer');
 
         // get our stream buffer
-        $buffer = new SocksStreamBuffer($streamDeps[0], $socksHost);
+        $buffer = new SocksStreamBuffer($streamDeps[0], $socksProxy);
 
         parent::__construct($buffer, $transportDeps[1], $transportDeps[2]);
-        $this->socksHost = $socksHost;
     }
 
 

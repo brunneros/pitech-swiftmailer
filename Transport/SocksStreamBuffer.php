@@ -50,6 +50,7 @@ class SocksStreamBuffer extends Swift_Transport_StreamBuffer
      */
     public function initialize(array $params)
     {
+        $this->_params = $params;
         $this->_establishSocketConnection();
     }
 
@@ -76,7 +77,7 @@ class SocksStreamBuffer extends Swift_Transport_StreamBuffer
         }
 
         if (!isset($this->socksProxy['host']) || !isset($this->socksProxy['port'])) {
-            throw new ParameterNotFoundException('Proxy host or port not defined ');
+            throw new ParameterNotFoundException('Proxy host or port');
         }
 
         // disable ssl host verification

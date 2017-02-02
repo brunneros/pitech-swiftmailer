@@ -1,15 +1,12 @@
 {
-    "name": "pitech-mures/mssqlbundle",
+    "name": "pitech-mures/swiftbundle",
     "type": "symfony-bundle",
     "license": [
         "MIT"
     ],
-    "require": {
-        "mediamonks/mssql-bundle": "^1.0@dev"
-    },
     "autoload": {
         "psr-4": {
-          "Pitech\\MssqlBundle\\": ""
+            "Pitech\\SwiftBundle\\": ""
         }
     }
 }

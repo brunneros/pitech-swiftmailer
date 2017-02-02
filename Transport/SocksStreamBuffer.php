@@ -5,13 +5,14 @@ namespace Pitech\SwiftBundle\Transport;
 use Swift_ReplacementFilterFactory;
 use Swift_Transport_StreamBuffer;
 use Swift_TransportException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * A generic IoBuffer implementation supporting remote sockets and local processes.
  *
  * @author Chris Corbyn
  */
-class Pitech_Transport_StreamBuffer extends Swift_Transport_StreamBuffer
+class SocksStreamBuffer extends Swift_Transport_StreamBuffer
 {
     /** A primary socket */
     private $_stream;
@@ -26,18 +27,18 @@ class Pitech_Transport_StreamBuffer extends Swift_Transport_StreamBuffer
     private $_params = array();
 
     /** The host which tunnels the connection */
-    private $socksHost;
+    private $socksProxy;
 
     /**
      * Create a new StreamBuffer using $replacementFactory for transformations.
      *
      * @param Swift_ReplacementFilterFactory $replacementFactory
-     * @param $socksHost
+     * @param $socksProxy
      */
-    public function __construct(Swift_ReplacementFilterFactory $replacementFactory, $socksHost)
+    public function __construct(Swift_ReplacementFilterFactory $replacementFactory, $socksProxy)
     {
         parent::__construct($replacementFactory);
-        $this->socksHost = $socksHost;
+        $this->socksProxy = $socksProxy;
     }
 
     /**
@@ -74,14 +75,19 @@ class Pitech_Transport_StreamBuffer extends Swift_Transport_StreamBuffer
             $options = array_merge($options, $this->_params['stream_context_options']);
         }
 
+        if (!isset($this->socksProxy['host']) || !isset($this->socksProxy['port'])) {
+            throw new ParameterNotFoundException('Proxy host or port not defined ');
+        }
+
         // disable ssl host verification
         $options['ssl']['verify_peer'] = FALSE;
         $options['ssl']['verify_peer_name'] = FALSE;
 
         $streamContext = stream_context_create($options);
 
-//        $this->_stream = @stream_socket_client($socksHost, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
-        $this->_stream = @stream_socket_client('tcp://serverproxy-ha-cl.e-ssi.net:1080', $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
+        $this->_stream = @stream_socket_client(
+            'tcp://' . $this->socksProxy['host'].':'.$this->socksProxy['port'], $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $streamContext
+        );
 
         fwrite($this->_stream , pack( "C3", 0x05, 0x01, 0x00 ) );
         $server_status = fread($this->_stream , 2048 );

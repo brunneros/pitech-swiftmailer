@@ -10,7 +10,7 @@ use Swift_TransportException;
 /**
  * Tweak of SwiftMailer SMTP transport class to work with SOCKS5 proxy
  */
-class Pitech_Transport_SocksEsmtpTransport extends Swift_Transport_EsmtpTransport
+class SocksEsmtpTransport extends Swift_Transport_EsmtpTransport
 {
     /**
      * ESMTP extension handlers.
@@ -59,7 +59,7 @@ class Pitech_Transport_SocksEsmtpTransport extends Swift_Transport_EsmtpTranspor
                     ->createDependenciesFor('transport.buffer');
 
         // get our stream buffer
-        $buffer = new Pitech_Transport_StreamBuffer($streamDeps[0], $socksHost);
+        $buffer = new SocksStreamBuffer($streamDeps[0], $socksHost);
 
         parent::__construct($buffer, $transportDeps[1], $transportDeps[2]);
         $this->socksHost = $socksHost;
